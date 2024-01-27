@@ -1,0 +1,43 @@
+version: 2.1
+
+orbs:
+  # The python orb contains a set of prepackaged circleci configuration you can use repeatedly in your configurations files
+  # Orb commands and jobs help you with common scripting around a language/tool
+  # so you dont have to copy and paste it everywhere.
+  # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
+  python: circleci/python@3.10.5
+
+workflows:
+  build_and_test:
+    jobs:
+      - build
+      - test:
+        requires:
+          - build
+
+
+jobs:
+  build: 
+    working_directory: ~/circleci-python
+    docker:
+      - image: cimg/python:3.10.5
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+          # app-dir: ~/project/package-directory/  # If your requirements.txt isn't in the root directory.
+          # pip-dependency-file: test-requirements.txt  # if you have a different name for your requirements file, maybe one that combines your runtime and test requirements.
+      - run:
+          name: Run circlecipy
+          # This assumes pytest is installed via the install-package step above
+          command: python3 main.py
+  test:
+    working_directory: ~/circleci-python
+    docker:
+      - image: cimg/python:3.10.5
+    steps:
+      - checkout
+      - run:
+          name: Run test circlecipy
+          # This assumes pytest is installed via the install-package step above
+          command: python3 main-test.py    
